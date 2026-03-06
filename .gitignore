@@ -28,8 +28,12 @@ cabal.project.local~
 *.out
 *.app
 
+# OS
+.DS_Store
+
 # Output
 output.tex
+texput.log
 
 # Local files
 local/

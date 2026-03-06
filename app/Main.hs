@@ -20,7 +20,10 @@
 module Main where
 
 import System.Environment (getArgs)
-import System.IO (hFlush, stdout)
+import System.IO (hFlush, stdout, stderr, hPutStrLn)
+import System.CPUTime (getCPUTime)
+import Control.DeepSeq (force)
+import Control.Exception (evaluate)
 import qualified Data.Text.Lazy.IO as TL
 
 import GEMM.Types (anticonnexity, groupInDegree, showGroup)
@@ -30,26 +33,36 @@ import GEMM.EilenbergMacLane
 import GEMM.LaTeX (renderDocumentP, renderDocumentZ)
 import GEMM.JSON (renderJsonP, renderJsonZ)
 
+data Opts = Opts
+  { optJson :: Bool
+  , optTime :: Bool
+  }
+
+parseOpts :: [String] -> (Opts, [String])
+parseOpts = go (Opts False False)
+  where
+    go opts ("--json":xs) = go (opts { optJson = True }) xs
+    go opts ("--time":xs) = go (opts { optTime = True }) xs
+    go opts xs            = (opts, xs)
+
 main :: IO ()
 main = do
   args <- getArgs
-  let (json, rest) = case args of
-        ("--json":xs) -> (True, xs)
-        xs            -> (False, xs)
+  let (opts, rest) = parseOpts args
   case rest of
     []              -> interactiveMode
-    -- K(Z, n): emm [--json] Z n range
-    ["Z", nS, rS]  -> cliModeZ json (read nS) (read rS)
-    -- Backward compatible: emm [--json] s n range  =>  p=2, f=s
-    [sS, nS, rS]   -> cliModeP json 2 (read sS) (read nS) (read rS)
-    -- General: emm [--json] p f n range
-    [pS, fS, nS, rS] -> cliModeP json (read pS) (read fS) (read nS) (read rS)
+    -- K(Z, n): emm [--json] [--time] Z n range
+    ["Z", nS, rS]  -> cliModeZ opts (read nS) (read rS)
+    -- Backward compatible: emm [--json] [--time] s n range  =>  p=2, f=s
+    [sS, nS, rS]   -> cliModeP opts 2 (read sS) (read nS) (read rS)
+    -- General: emm [--json] [--time] p f n range
+    [pS, fS, nS, rS] -> cliModeP opts (read pS) (read fS) (read nS) (read rS)
     _               -> do
       putStrLn "Usage:"
-      putStrLn "  gemm                          — interactive mode"
-      putStrLn "  gemm [--json] s n range       — K(Z/2^s, n)"
-      putStrLn "  gemm [--json] p f n range     — K(Z/p^f, n)"
-      putStrLn "  gemm [--json] Z n range       — K(Z, n)"
+      putStrLn "  gemm                                — interactive mode"
+      putStrLn "  gemm [--json] [--time] s n range    — K(Z/2^s, n)"
+      putStrLn "  gemm [--json] [--time] p f n range  — K(Z/p^f, n)"
+      putStrLn "  gemm [--json] [--time] Z n range    — K(Z, n)"
 
 interactiveMode :: IO ()
 interactiveMode = do
@@ -125,20 +138,51 @@ loop = do
     TL.writeFile "output.tex" (renderDocumentP p f n homology cohomology gens)
     loop
 
+-- | Measure CPU time of a fully-evaluated computation, report on stderr.
+-- When timing is disabled, just run the action.
+timed :: Bool -> String -> IO a -> IO a
+timed False _ action = action
+timed True label action = do
+  t0 <- getCPUTime
+  result <- action
+  t1 <- getCPUTime
+  let ms = fromIntegral (t1 - t0) / (1e9 :: Double)
+  hPutStrLn stderr $ label ++ ": " ++ formatMs ms
+  return result
+
+-- | Format milliseconds as "X.Y ms" or "X.YYY s".
+formatMs :: Double -> String
+formatMs t
+  | t < 1000  = roundTo 1 t ++ " ms"
+  | otherwise = roundTo 3 (t / 1000) ++ " s"
+  where
+    roundTo :: Int -> Double -> String
+    roundTo d x =
+      let factor = (10 :: Int) ^ d
+          r = fromIntegral (round (x * fromIntegral factor) :: Int)
+              / fromIntegral factor :: Double
+      in show r
+
 -- | CLI mode for K(Z/p^f, n): output LaTeX or JSON to stdout.
-cliModeP :: Bool -> Int -> Int -> Int -> Int -> IO ()
-cliModeP json p f n range_ = do
-  let (homology, gens) = emHomologyPWithGenerators p f n range_
-      cohomology = universalCoefficients homology
-  if json
+cliModeP :: Opts -> Int -> Int -> Int -> Int -> IO ()
+cliModeP opts p f n range_ = do
+  let t = timed (optTime opts)
+  (homology, gens) <- t "homology" $
+    evaluate (force (emHomologyPWithGenerators p f n range_))
+  cohomology <- t "cohomology" $
+    evaluate (force (universalCoefficients homology))
+  if optJson opts
     then putStr (renderJsonP p f n homology cohomology gens)
     else TL.putStr (renderDocumentP p f n homology cohomology gens)
 
 -- | CLI mode for K(Z, n): output LaTeX or JSON to stdout.
-cliModeZ :: Bool -> Int -> Int -> IO ()
-cliModeZ json n range_ = do
-  let (homology, primeGens) = emHomologyZWithGenerators n range_
-      cohomology = universalCoefficients homology
-  if json
+cliModeZ :: Opts -> Int -> Int -> IO ()
+cliModeZ opts n range_ = do
+  let t = timed (optTime opts)
+  (homology, primeGens) <- t "homology" $
+    evaluate (force (emHomologyZWithGenerators n range_))
+  cohomology <- t "cohomology" $
+    evaluate (force (universalCoefficients homology))
+  if optJson opts
     then putStr (renderJsonZ n homology cohomology primeGens)
     else TL.putStr (renderDocumentZ n homology cohomology primeGens)

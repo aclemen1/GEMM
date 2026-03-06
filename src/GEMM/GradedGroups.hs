@@ -127,23 +127,25 @@ homG = bilinearG hom
 extG :: Group -> Group -> Group
 extG = bilinearG ext
 
--- | Künneth formula for graded groups.
+-- | Künneth formula for graded groups (doubly sparse variant).
 --
 -- For graded groups @H@ and @H'@, the Künneth formula gives:
 --
 -- @H_n(X × Y) = ⊕_{i+j=n} (H_i(X) ⊗ H_j(Y)) ⊕ ⊕_{i+j=n-1} Tor(H_i(X), H_j(Y))@
+--
+-- This implementation iterates over all pairs of non-trivial degrees
+-- from both factors, achieving @Θ(M * N)@ pair evaluations where
+-- @M@ and @N@ are the numbers of non-trivial degrees of @gg1@ and @gg2@.
 kunneth :: GradedGroup -> GradedGroup -> GradedGroup
-kunneth gg1 gg2 =
-  let ac = max (anticonnexity gg1) (anticonnexity gg2)
-  in foldl (\acc n ->
-       let tensorPart = mconcat
-             [ singletonGG n (tensorG (groupInDegree i gg1) (groupInDegree (n - i) gg2))
-             | i <- [0..n] ]
-           torPart = mconcat
-             [ singletonGG n (torG (groupInDegree i gg1) (groupInDegree (n - 1 - i) gg2))
-             | i <- [0..n-1] ]
-       in acc <> tensorPart <> torPart
-     ) mempty [0..ac]
+kunneth (GradedGroup m1) (GradedGroup m2) =
+  let entries1 = IM.toAscList m1
+      entries2 = IM.toAscList m2
+  in mconcat
+       [ singletonGG (i + j) (tensorG g1 g2)
+         <> singletonGG (i + j + 1) (torG g1 g2)
+       | (i, g1) <- entries1
+       , (j, g2) <- entries2
+       ]
 
 -- | Universal Coefficients Theorem for integral cohomology.
 --

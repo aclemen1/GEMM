@@ -41,10 +41,15 @@ module GEMM.AdmissibleSequences
   , firstCech
   ) where
 
+import Control.DeepSeq (NFData(..))
+
 -- | An admissible sequence is a list of non-negative integers satisfying
 -- the admissibility condition a_i >= p * a_{i+1} for the relevant prime p.
 newtype AdmissibleSeq = AdmissibleSeq { getSeq :: [Int] }
   deriving (Eq, Show)
+
+instance NFData AdmissibleSeq where
+  rnf (AdmissibleSeq xs) = rnf xs
 
 -- | Check admissibility for p = 2: @a_i >= 2 * a_{i+1}@ for all i.
 admissible :: AdmissibleSeq -> Bool

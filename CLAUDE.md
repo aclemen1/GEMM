@@ -4,9 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-The Generalized Eilenberg-MacLane Machine (GEMM) computes integral (co)homology groups of Eilenberg-MacLane spaces K(Z/p^f, n) for any prime p, and K(Z, n). It is a Haskell program based on the results of Alain Clement's PhD thesis (*Integral Cohomology of Finite Postnikov Towers*, Appendix B) and Tischler's generalization to arbitrary primes.
+The Generalized Eilenberg-MacLane Machine (GEMM) computes integral (co)homology groups of Eilenberg-MacLane spaces K(Z/p^f, n) for any prime p, and K(Z, n). It is a Haskell program based on Cartan's séminaire (1954–55) and the results of Alain Clement's PhD thesis (*Integral Cohomology of Finite Postnikov Towers*, Appendix B).
 
 The original C++ sources (version 2.1, 2002) are preserved in `legacy/` for reference.
+The companion paper (algorithm description and conjectures) is in `paper/`.
 
 ## Version Control
 
@@ -41,6 +42,8 @@ test/
   GEMM/*Spec.hs              -- per-module tests
 legacy/
   *.cpp, *.hpp               -- original C++ implementation
+paper/
+  algorithm.tex              -- companion paper (algorithm + conjectures)
 ```
 
 ## Running

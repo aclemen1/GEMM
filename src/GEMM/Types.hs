@@ -35,6 +35,7 @@ module GEMM.Types
   , showGroup
   ) where
 
+import Control.DeepSeq (NFData(..))
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import Data.IntMap.Strict (IntMap)
@@ -54,11 +55,17 @@ import Data.List (intercalate)
 newtype Group = Group { unGroup :: Map (Int, Int) Int }
   deriving (Eq, Show)
 
+instance NFData Group where
+  rnf (Group m) = rnf m
+
 -- | A graded abelian group mapping integer degrees to 'Group's.
 --
 -- The 'Semigroup' instance merges groups degree-wise using direct sum.
 newtype GradedGroup = GradedGroup { unGraded :: IntMap Group }
   deriving (Eq, Show)
+
+instance NFData GradedGroup where
+  rnf (GradedGroup m) = rnf m
 
 -- | Direct sum of groups: merge by adding powers of each component.
 instance Semigroup Group where
