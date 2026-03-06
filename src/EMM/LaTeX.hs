@@ -17,6 +17,7 @@ module EMM.LaTeX
   , renderGenerators
   , renderGroup
   , renderWord
+  , ecType
   ) where
 
 import Prelude hiding (Word)

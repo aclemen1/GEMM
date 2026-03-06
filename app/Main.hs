@@ -28,24 +28,28 @@ import EMM.GradedGroups (universalCoefficients)
 import EMM.EilenbergMacLane
   ( emHomologyPWithGenerators, emHomologyZWithGenerators )
 import EMM.LaTeX (renderDocumentP, renderDocumentZ)
+import EMM.JSON (renderJsonP, renderJsonZ)
 
 main :: IO ()
 main = do
   args <- getArgs
-  case args of
+  let (json, rest) = case args of
+        ("--json":xs) -> (True, xs)
+        xs            -> (False, xs)
+  case rest of
     []              -> interactiveMode
-    -- K(Z, n): emm Z n range
-    ["Z", nS, rS]  -> cliModeZ (read nS) (read rS)
-    -- Backward compatible: emm s n range  =>  p=2, f=s
-    [sS, nS, rS]   -> cliModeP 2 (read sS) (read nS) (read rS)
-    -- General: emm p f n range
-    [pS, fS, nS, rS] -> cliModeP (read pS) (read fS) (read nS) (read rS)
+    -- K(Z, n): emm [--json] Z n range
+    ["Z", nS, rS]  -> cliModeZ json (read nS) (read rS)
+    -- Backward compatible: emm [--json] s n range  =>  p=2, f=s
+    [sS, nS, rS]   -> cliModeP json 2 (read sS) (read nS) (read rS)
+    -- General: emm [--json] p f n range
+    [pS, fS, nS, rS] -> cliModeP json (read pS) (read fS) (read nS) (read rS)
     _               -> do
       putStrLn "Usage:"
-      putStrLn "  emm                   — interactive mode"
-      putStrLn "  emm s n range         — K(Z/2^s, n)  (backward compatible)"
-      putStrLn "  emm p f n range       — K(Z/p^f, n)  (general prime)"
-      putStrLn "  emm Z n range         — K(Z, n)"
+      putStrLn "  emm                          — interactive mode"
+      putStrLn "  emm [--json] s n range       — K(Z/2^s, n)"
+      putStrLn "  emm [--json] p f n range     — K(Z/p^f, n)"
+      putStrLn "  emm [--json] Z n range       — K(Z, n)"
 
 interactiveMode :: IO ()
 interactiveMode = do
@@ -121,16 +125,20 @@ loop = do
     TL.writeFile "output.tex" (renderDocumentP p f n homology cohomology gens)
     loop
 
--- | CLI mode for K(Z/p^f, n): output LaTeX to stdout.
-cliModeP :: Int -> Int -> Int -> Int -> IO ()
-cliModeP p f n range_ = do
+-- | CLI mode for K(Z/p^f, n): output LaTeX or JSON to stdout.
+cliModeP :: Bool -> Int -> Int -> Int -> Int -> IO ()
+cliModeP json p f n range_ = do
   let (homology, gens) = emHomologyPWithGenerators p f n range_
       cohomology = universalCoefficients homology
-  TL.putStr (renderDocumentP p f n homology cohomology gens)
+  if json
+    then putStr (renderJsonP p f n homology cohomology gens)
+    else TL.putStr (renderDocumentP p f n homology cohomology gens)
 
--- | CLI mode for K(Z, n): output LaTeX to stdout.
-cliModeZ :: Int -> Int -> IO ()
-cliModeZ n range_ = do
+-- | CLI mode for K(Z, n): output LaTeX or JSON to stdout.
+cliModeZ :: Bool -> Int -> Int -> IO ()
+cliModeZ json n range_ = do
   let (homology, primeGens) = emHomologyZWithGenerators n range_
       cohomology = universalCoefficients homology
-  TL.putStr (renderDocumentZ n homology cohomology primeGens)
+  if json
+    then putStr (renderJsonZ n homology cohomology primeGens)
+    else TL.putStr (renderDocumentZ n homology cohomology primeGens)
