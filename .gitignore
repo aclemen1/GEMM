@@ -31,5 +31,8 @@ cabal.project.local~
 # Output
 output.tex
 
+# Local files
+local/
+
 # Large PDFs (reference only)
 Tischler.pdf
