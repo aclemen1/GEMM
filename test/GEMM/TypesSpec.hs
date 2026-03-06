@@ -1,9 +1,9 @@
-module EMM.TypesSpec (spec) where
+module GEMM.TypesSpec (spec) where
 
 import Test.Hspec
 import qualified Data.Map.Strict as Map
 import qualified Data.IntMap.Strict as IM
-import EMM.Types
+import GEMM.Types
 
 spec :: Spec
 spec = do

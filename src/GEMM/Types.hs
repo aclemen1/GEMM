@@ -1,5 +1,5 @@
 -- |
--- Module      : EMM.Types
+-- Module      : GEMM.Types
 -- Description : Core algebraic types for the Eilenberg-MacLane Machine.
 --
 -- This module defines the fundamental types used throughout the EMM:
@@ -22,7 +22,7 @@
 -- The previous representation used @IntMap Int@ with implicit prime p=2.
 -- The new representation is a strict superset: it handles any prime and
 -- mixed-prime torsion.
-module EMM.Types
+module GEMM.Types
   ( Group(..)
   , GradedGroup(..)
   , emptyGroup

@@ -1,8 +1,8 @@
-module EMM.GradedGroupsSpec (spec) where
+module GEMM.GradedGroupsSpec (spec) where
 
 import Test.Hspec
-import EMM.Types
-import EMM.GradedGroups
+import GEMM.Types
+import GEMM.GradedGroups
 
 spec :: Spec
 spec = do

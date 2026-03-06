@@ -1,8 +1,8 @@
-module EMM.EilenbergMacLaneSpec (spec) where
+module GEMM.EilenbergMacLaneSpec (spec) where
 
 import Test.Hspec
-import EMM.Types
-import EMM.EilenbergMacLane
+import GEMM.Types
+import GEMM.EilenbergMacLane
 
 spec :: Spec
 spec = do

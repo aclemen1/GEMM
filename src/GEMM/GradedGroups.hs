@@ -1,5 +1,5 @@
 -- |
--- Module      : EMM.GradedGroups
+-- Module      : GEMM.GradedGroups
 -- Description : Algebraic operations on groups and graded groups.
 --
 -- Implements the four fundamental bifunctors on finitely generated abelian
@@ -30,7 +30,7 @@
 --   * @Tor(Z/p^a, Z/q^b) = 0@
 --   * @Hom(Z/p^a, Z/q^b) = 0@
 --   * @Ext(Z/p^a, Z/q^b) = 0@
-module EMM.GradedGroups
+module GEMM.GradedGroups
   ( tensor
   , tor
   , hom
@@ -45,7 +45,7 @@ module EMM.GradedGroups
 
 import qualified Data.Map.Strict as Map
 import qualified Data.IntMap.Strict as IM
-import EMM.Types
+import GEMM.Types
 
 -- | Tensor product of two powered cyclic group components.
 --

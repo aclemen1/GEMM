@@ -1,10 +1,10 @@
 -- |
--- Module      : EMM.JSON
+-- Module      : GEMM.JSON
 -- Description : JSON rendering of EMM results.
 --
 -- Generates JSON output for homology, cohomology, and generators
 -- of Eilenberg-MacLane spaces. No external dependencies required.
-module EMM.JSON
+module GEMM.JSON
   ( renderJsonP
   , renderJsonZ
   ) where
@@ -13,10 +13,10 @@ import Prelude hiding (Word)
 import Data.List (intercalate)
 import qualified Data.IntMap.Strict as IM
 
-import EMM.Types
-import EMM.AdmissibleSequences
-import EMM.Words
-import EMM.LaTeX (ecType, renderGroup)
+import GEMM.Types
+import GEMM.AdmissibleSequences
+import GEMM.Words
+import GEMM.LaTeX (ecType, renderGroup)
 import Data.Text.Lazy.Builder (toLazyText)
 import qualified Data.Text.Lazy as TL
 
@@ -64,7 +64,7 @@ renderGradedGroupJson gg ac =
     | deg <- [0..ac]
     ] ++ "\n  }"
 
--- | Convert a Group to its LaTeX representation, reusing EMM.LaTeX.renderGroup.
+-- | Convert a Group to its LaTeX representation, reusing GEMM.LaTeX.renderGroup.
 groupToLatex :: Group -> String
 groupToLatex = TL.unpack . toLazyText . renderGroup
 

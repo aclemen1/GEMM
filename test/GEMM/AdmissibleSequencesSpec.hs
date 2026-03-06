@@ -1,8 +1,8 @@
-module EMM.AdmissibleSequencesSpec (spec) where
+module GEMM.AdmissibleSequencesSpec (spec) where
 
 import Test.Hspec
 import Test.QuickCheck
-import EMM.AdmissibleSequences
+import GEMM.AdmissibleSequences
 
 spec :: Spec
 spec = do

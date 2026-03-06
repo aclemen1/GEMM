@@ -1,10 +1,10 @@
 cabal-version:   3.0
-name:            emm
-version:         3.0.0
-synopsis:        The Eilenberg-MacLane Machine
+name:            gemm
+version:         1.0.0
+synopsis:        The Generalized Eilenberg-MacLane Machine
 description:
-  Computes integral (co)homology groups of 1-connected
-  Eilenberg-MacLane spaces K(Z/2^s, n).
+  Computes integral (co)homology groups of Eilenberg-MacLane spaces
+  K(Z/p^f, n) for any prime p, and K(Z, n).
 license:         MIT
 license-file:    LICENSE
 author:          Alain Clement
@@ -14,14 +14,14 @@ build-type:      Simple
 
 library
   exposed-modules:
-    EMM.Types
-    EMM.GradedGroups
-    EMM.AdmissibleSequences
-    EMM.Words
-    EMM.ElementaryComplex
-    EMM.EilenbergMacLane
-    EMM.LaTeX
-    EMM.JSON
+    GEMM.Types
+    GEMM.GradedGroups
+    GEMM.AdmissibleSequences
+    GEMM.Words
+    GEMM.ElementaryComplex
+    GEMM.EilenbergMacLane
+    GEMM.LaTeX
+    GEMM.JSON
   hs-source-dirs:  src
   build-depends:
     base        >= 4.17 && < 5,
@@ -30,29 +30,29 @@ library
   default-language: Haskell2010
   ghc-options:     -Wall
 
-executable emm
+executable gemm
   main-is:         Main.hs
   hs-source-dirs:  app
   build-depends:
     base >= 4.17 && < 5,
-    emm,
+    gemm,
     text >= 2.0
   default-language: Haskell2010
   ghc-options:     -Wall
 
-test-suite emm-test
+test-suite gemm-test
   type:            exitcode-stdio-1.0
   main-is:         Spec.hs
   other-modules:
-    EMM.TypesSpec
-    EMM.GradedGroupsSpec
-    EMM.AdmissibleSequencesSpec
-    EMM.ElementaryComplexSpec
-    EMM.EilenbergMacLaneSpec
+    GEMM.TypesSpec
+    GEMM.GradedGroupsSpec
+    GEMM.AdmissibleSequencesSpec
+    GEMM.ElementaryComplexSpec
+    GEMM.EilenbergMacLaneSpec
   hs-source-dirs:  test
   build-depends:
     base        >= 4.17 && < 5,
-    emm,
+    gemm,
     containers  >= 0.6,
     hspec       >= 2.11,
     QuickCheck  >= 2.14

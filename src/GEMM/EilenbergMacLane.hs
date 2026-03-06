@@ -1,5 +1,5 @@
 -- |
--- Module      : EMM.EilenbergMacLane
+-- Module      : GEMM.EilenbergMacLane
 -- Description : Computation of integral (co)homology of Eilenberg-MacLane spaces.
 --
 -- This module implements the main algorithm of the Eilenberg-MacLane Machine.
@@ -25,7 +25,7 @@
 -- Cartan, H. — Séminaire H. Cartan, 1954-55, Exposés 1-13.
 -- Clément, A. — Integral Cohomology of Finite Postnikov Towers, Appendix B.
 -- Tischler, N. — Chapter II, Propositions 2.11-2.13, Corollaire 2.15.
-module EMM.EilenbergMacLane
+module GEMM.EilenbergMacLane
   ( -- * Original interface (p = 2)
     emHomology
   , emHomologyWithGenerators
@@ -42,12 +42,12 @@ module EMM.EilenbergMacLane
 
 import qualified Data.Map.Strict as Map
 import qualified Data.IntMap.Strict as IM
-import EMM.Types
-import EMM.GradedGroups (kunneth, universalCoefficients)
-import EMM.AdmissibleSequences
+import GEMM.Types
+import GEMM.GradedGroups (kunneth, universalCoefficients)
+import GEMM.AdmissibleSequences
   ( AdmissibleSeq(..), stableDegree, genus
   , generateSequencesP, filterByEvenFirst )
-import EMM.ElementaryComplex (ecHomology)
+import GEMM.ElementaryComplex (ecHomology)
 
 -- ---------------------------------------------------------------------------
 -- Original interface for K(Z/2^s, n) — backward compatible

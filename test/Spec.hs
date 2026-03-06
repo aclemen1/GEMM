@@ -1,15 +1,15 @@
 import Test.Hspec
 
-import qualified EMM.TypesSpec
-import qualified EMM.GradedGroupsSpec
-import qualified EMM.AdmissibleSequencesSpec
-import qualified EMM.ElementaryComplexSpec
-import qualified EMM.EilenbergMacLaneSpec
+import qualified GEMM.TypesSpec
+import qualified GEMM.GradedGroupsSpec
+import qualified GEMM.AdmissibleSequencesSpec
+import qualified GEMM.ElementaryComplexSpec
+import qualified GEMM.EilenbergMacLaneSpec
 
 main :: IO ()
 main = hspec $ do
-  describe "EMM.Types" EMM.TypesSpec.spec
-  describe "EMM.GradedGroups" EMM.GradedGroupsSpec.spec
-  describe "EMM.AdmissibleSequences" EMM.AdmissibleSequencesSpec.spec
-  describe "EMM.ElementaryComplex" EMM.ElementaryComplexSpec.spec
-  describe "EMM.EilenbergMacLane" EMM.EilenbergMacLaneSpec.spec
+  describe "GEMM.Types" GEMM.TypesSpec.spec
+  describe "GEMM.GradedGroups" GEMM.GradedGroupsSpec.spec
+  describe "GEMM.AdmissibleSequences" GEMM.AdmissibleSequencesSpec.spec
+  describe "GEMM.ElementaryComplex" GEMM.ElementaryComplexSpec.spec
+  describe "GEMM.EilenbergMacLane" GEMM.EilenbergMacLaneSpec.spec

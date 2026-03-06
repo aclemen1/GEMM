@@ -1,5 +1,5 @@
 -- |
--- Module      : EMM.ElementaryComplex
+-- Module      : GEMM.ElementaryComplex
 -- Description : Homology of elementary complexes in the sense of Cartan.
 --
 -- An elementary complex of type (II) is a tensor product of two type (I)
@@ -27,7 +27,7 @@
 --   * @degree@ — the degree of the generator of the elementary complex.
 --   * @logh@ — the log (base p) of the differential's order h = p^logh.
 --   * @ac@ — upper bound (anticonnexity) for the computation.
-module EMM.ElementaryComplex
+module GEMM.ElementaryComplex
   ( nuP
   , nu2
   , ecHomology
@@ -35,8 +35,8 @@ module EMM.ElementaryComplex
   ) where
 
 import qualified Data.IntMap.Strict as IM
-import EMM.Types
-import EMM.GradedGroups (universalCoefficients)
+import GEMM.Types
+import GEMM.GradedGroups (universalCoefficients)
 
 -- | p-adic valuation: the largest k such that p^k divides n.
 --

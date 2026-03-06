@@ -1,5 +1,5 @@
 -- |
--- Module      : EMM.AdmissibleSequences
+-- Module      : GEMM.AdmissibleSequences
 -- Description : Generation and manipulation of admissible sequences.
 --
 -- An admissible sequence (in the sense of Steenrod/Cartan) is a finite
@@ -24,7 +24,7 @@
 -- Cartan, H. — Algèbres d'Eilenberg-MacLane, Séminaire H. Cartan, 1954-55.
 -- Clément, A. — Integral Cohomology of Finite Postnikov Towers, Appendix B.
 -- Tischler, N. — Chapter II, §II.1-II.2.
-module EMM.AdmissibleSequences
+module GEMM.AdmissibleSequences
   ( AdmissibleSeq(..)
   , admissible
   , admissibleForPrime

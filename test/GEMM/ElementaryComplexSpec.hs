@@ -1,8 +1,8 @@
-module EMM.ElementaryComplexSpec (spec) where
+module GEMM.ElementaryComplexSpec (spec) where
 
 import Test.Hspec
-import EMM.Types
-import EMM.ElementaryComplex
+import GEMM.Types
+import GEMM.ElementaryComplex
 
 spec :: Spec
 spec = do

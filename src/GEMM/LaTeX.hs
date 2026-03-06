@@ -1,5 +1,5 @@
 -- |
--- Module      : EMM.LaTeX
+-- Module      : GEMM.LaTeX
 -- Description : LaTeX rendering of EMM results.
 --
 -- Generates LaTeX documents displaying the integral homology and cohomology
@@ -7,7 +7,7 @@
 -- sequences and their associated Steenrod words) involved in the computation.
 --
 -- The output uses the @supertabular@ package for multi-page tables.
-module EMM.LaTeX
+module GEMM.LaTeX
   ( renderDocument
   , renderDocumentP
   , renderDocumentZ
@@ -25,9 +25,9 @@ import Data.Text.Lazy (Text)
 import Data.Text.Lazy.Builder (Builder, fromString, toLazyText)
 import qualified Data.Map.Strict as Map
 
-import EMM.Types
-import EMM.AdmissibleSequences
-import EMM.Words
+import GEMM.Types
+import GEMM.AdmissibleSequences
+import GEMM.Words
 
 -- | Render a complete LaTeX document for K(Z/2^s, n).
 -- Backward-compatible wrapper around 'renderDocumentP'.
@@ -68,11 +68,11 @@ renderTopMatter = mconcat
   , str "\\begin{document}\n"
   , str "\\newcommand{\\Z}{\\mathbb{Z}}\n"
   , str "\\renewcommand{\\thefootnote}{\\fnsymbol{footnote}}"
-  , str "\\section*{The Eilenberg-MacLane machine\n"
+  , str "\\section*{The Generalized Eilenberg-MacLane Machine\n"
   , str "\\footnote{\\tiny Alain Cl\\'ement, Ph.D. Thesis, Institute of Mathematics, University of Lausanne, Switzerland.}\n"
   , str "}\n"
   , str "{\\it A Haskell program designed to compute the integral homology and cohomology groups"
-  , str " of Eilenberg-MacLane spaces.}\\\\"
+  , str " of Eilenberg-MacLane spaces $K(\\Z/p^f,n)$ for any prime $p$, and $K(\\Z,n)$.}\\\\"
   ]
 
 -- | LaTeX document ending.

@@ -23,12 +23,12 @@ import System.Environment (getArgs)
 import System.IO (hFlush, stdout)
 import qualified Data.Text.Lazy.IO as TL
 
-import EMM.Types (anticonnexity, groupInDegree, showGroup)
-import EMM.GradedGroups (universalCoefficients)
-import EMM.EilenbergMacLane
+import GEMM.Types (anticonnexity, groupInDegree, showGroup)
+import GEMM.GradedGroups (universalCoefficients)
+import GEMM.EilenbergMacLane
   ( emHomologyPWithGenerators, emHomologyZWithGenerators )
-import EMM.LaTeX (renderDocumentP, renderDocumentZ)
-import EMM.JSON (renderJsonP, renderJsonZ)
+import GEMM.LaTeX (renderDocumentP, renderDocumentZ)
+import GEMM.JSON (renderJsonP, renderJsonZ)
 
 main :: IO ()
 main = do
@@ -46,17 +46,17 @@ main = do
     [pS, fS, nS, rS] -> cliModeP json (read pS) (read fS) (read nS) (read rS)
     _               -> do
       putStrLn "Usage:"
-      putStrLn "  emm                          — interactive mode"
-      putStrLn "  emm [--json] s n range       — K(Z/2^s, n)"
-      putStrLn "  emm [--json] p f n range     — K(Z/p^f, n)"
-      putStrLn "  emm [--json] Z n range       — K(Z, n)"
+      putStrLn "  gemm                          — interactive mode"
+      putStrLn "  gemm [--json] s n range       — K(Z/2^s, n)"
+      putStrLn "  gemm [--json] p f n range     — K(Z/p^f, n)"
+      putStrLn "  gemm [--json] Z n range       — K(Z, n)"
 
 interactiveMode :: IO ()
 interactiveMode = do
-  putStrLn "\nThe Eilenberg-MacLane machine"
-  putStrLn "============================="
-  putStrLn "Version 4.0 (generalized Haskell rewrite)\n"
-  putStrLn "Alain Clement"
+  putStrLn "\nThe Generalized Eilenberg-MacLane Machine (GEMM)"
+  putStrLn "================================================"
+  putStrLn "Version 4.0\n"
+  putStrLn "Alain Clément"
   putStrLn "University of Lausanne"
   putStrLn "Switzerland\n"
   putStrLn "This program computes the integral homology and"
@@ -64,7 +64,7 @@ interactiveMode = do
   putStrLn "K(Z/p^f, n) for any prime p, and K(Z, n).\n"
   putStrLn "If you want a LaTeX file as output, you can"
   putStrLn "also quit and execute the machine again with"
-  putStrLn "arguments: emm [p] [f] [n] [range]\n"
+  putStrLn "arguments: gemm [p] [f] [n] [range]\n"
   loop
 
 loop :: IO ()

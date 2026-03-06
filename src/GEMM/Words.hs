@@ -1,5 +1,5 @@
 -- |
--- Module      : EMM.Words
+-- Module      : GEMM.Words
 -- Description : Symbolic words representing Steenrod operations.
 --
 -- A p-word (Tischler, Def. 2.5) is a finite sequence of letters from the
@@ -26,7 +26,7 @@
 --
 -- Clément, A. — Integral Cohomology of Finite Postnikov Towers, Appendix B.
 -- Tischler, N. — Chapter II, Def. 2.5.
-module EMM.Words
+module GEMM.Words
   ( Letter(..)
   , PoweredLetter(..)
   , Word(..)
@@ -36,7 +36,7 @@ module EMM.Words
   ) where
 
 import Prelude hiding (Word)
-import EMM.AdmissibleSequences
+import GEMM.AdmissibleSequences
 
 -- | Letters of the p-word alphabet.
 --
