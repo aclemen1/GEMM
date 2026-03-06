@@ -103,6 +103,30 @@ spec = do
     it "H_{2k} = 0 for k=1..6" $
       mapM_ (\k -> groupInDegree (2*k) h `shouldBe` emptyGroup) [1..6]
 
+  describe "K(Z/5, 1) = BZ/5 (lens space)" $ do
+    let h = emHomologyP 5 1 1 12
+
+    it "H_0 = Z" $
+      groupInDegree 0 h `shouldBe` freeGroup 1
+
+    it "H_{2k-1} = Z/5 for k=1..6" $
+      mapM_ (\k -> groupInDegree (2*k - 1) h `shouldBe` singletonGroup 5 1 1) [1..6]
+
+    it "H_{2k} = 0 for k=1..6" $
+      mapM_ (\k -> groupInDegree (2*k) h `shouldBe` emptyGroup) [1..6]
+
+  describe "K(Z/7, 1) = BZ/7 (lens space)" $ do
+    let h = emHomologyP 7 1 1 14
+
+    it "H_0 = Z" $
+      groupInDegree 0 h `shouldBe` freeGroup 1
+
+    it "H_{2k-1} = Z/7 for k=1..7" $
+      mapM_ (\k -> groupInDegree (2*k - 1) h `shouldBe` singletonGroup 7 1 1) [1..7]
+
+    it "H_{2k} = 0 for k=1..7" $
+      mapM_ (\k -> groupInDegree (2*k) h `shouldBe` emptyGroup) [1..7]
+
   describe "K(Z/3, 2)" $ do
     let h = emHomologyP 3 1 2 10
 
