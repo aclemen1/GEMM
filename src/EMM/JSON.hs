@@ -11,13 +11,12 @@ module EMM.JSON
 
 import Prelude hiding (Word)
 import Data.List (intercalate)
-import qualified Data.Map.Strict as Map
 import qualified Data.IntMap.Strict as IM
 
 import EMM.Types
 import EMM.AdmissibleSequences
 import EMM.Words
-import EMM.LaTeX (ecType)
+import EMM.LaTeX (ecType, renderGroup)
 import Data.Text.Lazy.Builder (toLazyText)
 import qualified Data.Text.Lazy as TL
 
@@ -44,7 +43,7 @@ renderJsonZ n homology cohomology primeGens =
   let ac = max (anticonnexity homology) (anticonnexity cohomology)
   in unlines
     [ "{"
-    , "  \"space\": " ++ jsonStr ("K(Z," ++ show n ++ ")") ++ ","
+    , "  \"space\": " ++ jsonStr ("K(\\Z," ++ show n ++ ")") ++ ","
     , "  \"parameters\": { \"n\": " ++ show n
                       ++ ", \"range\": " ++ show ac ++ " },"
     , "  \"homology\": " ++ renderGradedGroupJson homology ac ++ ","
@@ -60,25 +59,14 @@ renderJsonZ n homology cohomology primeGens =
 renderGradedGroupJson :: GradedGroup -> Int -> String
 renderGradedGroupJson gg ac =
   "{\n" ++ intercalate ",\n"
-    [ "    " ++ jsonStr (show deg) ++ ": " ++ renderGroupJson (groupInDegree deg gg)
+    [ "    " ++ jsonStr (show deg) ++ ": "
+      ++ jsonStr (groupToLatex (groupInDegree deg gg))
     | deg <- [0..ac]
     ] ++ "\n  }"
 
-renderGroupJson :: Group -> String
-renderGroupJson (Group m)
-  | Map.null m = "{ \"free_rank\": 0, \"torsion\": [] }"
-  | otherwise =
-      let freeRank = Map.findWithDefault 0 (0,0) m
-          torsionParts = [ renderTorsionComponent pk pow
-                         | (pk, pow) <- Map.toAscList m, pk /= (0,0) ]
-      in "{ \"free_rank\": " ++ show freeRank
-         ++ ", \"torsion\": [" ++ intercalate ", " torsionParts ++ "] }"
-
-renderTorsionComponent :: (Int, Int) -> Int -> String
-renderTorsionComponent (p, k) copies =
-  "{ \"prime\": " ++ show p
-  ++ ", \"power\": " ++ show k
-  ++ ", \"copies\": " ++ show copies ++ " }"
+-- | Convert a Group to its LaTeX representation, reusing EMM.LaTeX.renderGroup.
+groupToLatex :: Group -> String
+groupToLatex = TL.unpack . toLazyText . renderGroup
 
 -- ---------------------------------------------------------------------------
 -- Generator rendering for K(Z/p^f, n)
@@ -155,11 +143,11 @@ renderSeqJson (AdmissibleSeq xs) = "[" ++ intercalate ", " (map show xs) ++ "]"
 ecTypeStr :: Int -> String
 ecTypeStr d = TL.unpack (toLazyText (ecType d))
 
--- | Space name for K(Z/p^f, n).
+-- | Space name for K(Z/p^f, n) in LaTeX.
 spaceNameP :: Int -> Int -> Int -> String
 spaceNameP p f n
-  | f == 1    = "K(Z/" ++ show p ++ "," ++ show n ++ ")"
-  | otherwise = "K(Z/" ++ show p ++ "^" ++ show f ++ "," ++ show n ++ ")"
+  | f == 1    = "K(\\Z/" ++ show p ++ "," ++ show n ++ ")"
+  | otherwise = "K(\\Z/" ++ show p ++ "^{" ++ show f ++ "}," ++ show n ++ ")"
 
 -- | Render a word as a plain text string.
 wordToStr :: Int -> Word -> Int -> String
