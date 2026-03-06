@@ -1,0 +1,59 @@
+cabal-version:   3.0
+name:            emm
+version:         3.0.0
+synopsis:        The Eilenberg-MacLane Machine
+description:
+  Computes integral (co)homology groups of 1-connected
+  Eilenberg-MacLane spaces K(Z/2^s, n).
+license:         MIT
+license-file:    LICENSE
+author:          Alain Clement
+maintainer:      alain.clement@unil.ch
+category:        Math
+build-type:      Simple
+
+library
+  exposed-modules:
+    EMM.Types
+    EMM.GradedGroups
+    EMM.AdmissibleSequences
+    EMM.Words
+    EMM.ElementaryComplex
+    EMM.EilenbergMacLane
+    EMM.LaTeX
+  hs-source-dirs:  src
+  build-depends:
+    base        >= 4.17 && < 5,
+    containers  >= 0.6,
+    text        >= 2.0
+  default-language: Haskell2010
+  ghc-options:     -Wall
+
+executable emm
+  main-is:         Main.hs
+  hs-source-dirs:  app
+  build-depends:
+    base >= 4.17 && < 5,
+    emm,
+    text >= 2.0
+  default-language: Haskell2010
+  ghc-options:     -Wall
+
+test-suite emm-test
+  type:            exitcode-stdio-1.0
+  main-is:         Spec.hs
+  other-modules:
+    EMM.TypesSpec
+    EMM.GradedGroupsSpec
+    EMM.AdmissibleSequencesSpec
+    EMM.ElementaryComplexSpec
+    EMM.EilenbergMacLaneSpec
+  hs-source-dirs:  test
+  build-depends:
+    base        >= 4.17 && < 5,
+    emm,
+    containers  >= 0.6,
+    hspec       >= 2.11,
+    QuickCheck  >= 2.14
+  default-language: Haskell2010
+  ghc-options:     -Wall
