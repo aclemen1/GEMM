@@ -38,5 +38,11 @@ texput.log
 # Local files
 local/
 
+# FFI build artifacts
+ffi/rust/*/target/
+ffi/python/gemm/__pycache__/
+ffi/julia/GEMM/Manifest.toml
+ffi/lib/
+
 # Claude Code
 CLAUDE.local.md
