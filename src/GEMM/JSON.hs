@@ -11,7 +11,6 @@ module GEMM.JSON
 
 import Prelude hiding (Word)
 import Data.List (intercalate)
-import qualified Data.IntMap.Strict as IM
 
 import GEMM.Types
 import GEMM.AdmissibleSequences

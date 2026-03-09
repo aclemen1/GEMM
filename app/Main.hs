@@ -26,7 +26,7 @@ import Control.DeepSeq (force)
 import Control.Exception (evaluate)
 import qualified Data.Text.Lazy.IO as TL
 
-import GEMM.Types (anticonnexity, groupInDegree, showGroup)
+import GEMM.Types (groupInDegree, showGroup, truncateGraded)
 import GEMM.GradedGroups (universalCoefficients)
 import GEMM.EilenbergMacLane
   ( emHomologyPWithGenerators, emHomologyZWithGenerators )
@@ -95,14 +95,14 @@ loop = do
     hFlush stdout
     range_ <- readLn
 
-    let (homology, primeGens) = emHomologyZWithGenerators n range_
+    let (homologyFull, primeGens) = emHomologyZWithGenerators n range_
+        homology = truncateGraded range_ homologyFull
         cohomology = universalCoefficients homology
-        ac = anticonnexity homology
 
     putStrLn ""
     mapM_ (\deg ->
         putStrLn $ show deg ++ ": " ++ showGroup (groupInDegree deg homology)
-      ) [0..ac]
+      ) [0..range_]
     putStrLn ""
 
     putStrLn "Results are output in the LaTeX file \"output.tex\"."
@@ -122,14 +122,14 @@ loop = do
     hFlush stdout
     range_ <- readLn
 
-    let (homology, gens) = emHomologyPWithGenerators p f n range_
+    let (homologyFull, gens) = emHomologyPWithGenerators p f n range_
+        homology = truncateGraded range_ homologyFull
         cohomology = universalCoefficients homology
-        ac = anticonnexity homology
 
     putStrLn ""
     mapM_ (\deg ->
         putStrLn $ show deg ++ ": " ++ showGroup (groupInDegree deg homology)
-      ) [0..ac]
+      ) [0..range_]
     putStrLn ""
 
     putStrLn "Results are output in the LaTeX file \"output.tex\"."
@@ -167,8 +167,9 @@ formatMs t
 cliModeP :: Opts -> Int -> Int -> Int -> Int -> IO ()
 cliModeP opts p f n range_ = do
   let t = timed (optTime opts)
-  (homology, gens) <- t "homology" $
+  (homologyFull, gens) <- t "homology" $
     evaluate (force (emHomologyPWithGenerators p f n range_))
+  let homology = truncateGraded range_ homologyFull
   cohomology <- t "cohomology" $
     evaluate (force (universalCoefficients homology))
   if optJson opts
@@ -179,8 +180,9 @@ cliModeP opts p f n range_ = do
 cliModeZ :: Opts -> Int -> Int -> IO ()
 cliModeZ opts n range_ = do
   let t = timed (optTime opts)
-  (homology, primeGens) <- t "homology" $
+  (homologyFull, primeGens) <- t "homology" $
     evaluate (force (emHomologyZWithGenerators n range_))
+  let homology = truncateGraded range_ homologyFull
   cohomology <- t "cohomology" $
     evaluate (force (universalCoefficients homology))
   if optJson opts

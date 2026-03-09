@@ -112,7 +112,7 @@ emHomologyPWithGenerators p f n range_ =
               ecDeg sq = (p - 1) * stableDegree sq + n
           in foldl (\(gg', gs') sq ->
                if stableDegree sq >= 0
-               then ( kunneth gg' (ecHomology p (ecDeg sq) 1 range_)
+               then ( kunneth range_ gg' (ecHomology p (ecDeg sq) 1 range_)
                     , gs' ++ [sq] )
                else (gg', gs')
              ) (gg, gs) seqs
@@ -198,10 +198,7 @@ freePartX0 n range_
 --   * The base elementary complex is trivial (only Z in degree 0),
 --     since there is no X'(p) for K(Z, n).
 --   * All elementary complex factors have log-height 1 (order p).
-computePTorsionZ :: Int -> Int -> Int -> GradedGroup
-computePTorsionZ p n range_ = fst (computePTorsionZWithGenerators p n range_)
-
--- | Like 'computePTorsionZ' but also returns the admissible sequences used.
+-- | Compute p-torsion of K(Z, n), also returning the admissible sequences used.
 computePTorsionZWithGenerators :: Int -> Int -> Int -> (GradedGroup, [AdmissibleSeq])
 computePTorsionZWithGenerators p n range_ =
   let base = GradedGroup (IM.singleton 0 (freeGroup 1))
@@ -211,7 +208,7 @@ computePTorsionZWithGenerators p n range_ =
               ecDeg sq = (p - 1) * stableDegree sq + n
           in foldl (\(gg', gs') sq ->
                if stableDegree sq >= 0
-               then ( kunneth gg' (ecHomology p (ecDeg sq) 1 range_)
+               then ( kunneth range_ gg' (ecHomology p (ecDeg sq) 1 range_)
                     , gs' ++ [sq] )
                else (gg', gs')
              ) (gg, gs) seqs

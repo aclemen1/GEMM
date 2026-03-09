@@ -32,6 +32,7 @@ module GEMM.Types
   , addFreeRank
   , groupInDegree
   , anticonnexity
+  , truncateGraded
   , showGroup
   ) where
 
@@ -128,6 +129,12 @@ anticonnexity :: GradedGroup -> Int
 anticonnexity (GradedGroup m)
   | IM.null m = 0
   | otherwise = fst (IM.findMax m)
+
+-- | Truncate a graded group to degrees @0@ through @r@.
+truncateGraded :: Int -> GradedGroup -> GradedGroup
+truncateGraded r (GradedGroup m) =
+  let (lo, _) = IM.split (r + 1) m
+  in GradedGroup lo
 
 -- | Human-readable display of a group.
 --

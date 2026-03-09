@@ -127,24 +127,27 @@ homG = bilinearG hom
 extG :: Group -> Group -> Group
 extG = bilinearG ext
 
--- | Künneth formula for graded groups (doubly sparse variant).
+-- | Künneth formula for graded groups (doubly sparse, bounded variant).
 --
 -- For graded groups @H@ and @H'@, the Künneth formula gives:
 --
 -- @H_n(X × Y) = ⊕_{i+j=n} (H_i(X) ⊗ H_j(Y)) ⊕ ⊕_{i+j=n-1} Tor(H_i(X), H_j(Y))@
 --
--- This implementation iterates over all pairs of non-trivial degrees
--- from both factors, achieving @Θ(M * N)@ pair evaluations where
--- @M@ and @N@ are the numbers of non-trivial degrees of @gg1@ and @gg2@.
-kunneth :: GradedGroup -> GradedGroup -> GradedGroup
-kunneth (GradedGroup m1) (GradedGroup m2) =
+-- The @maxDeg@ parameter bounds the computation: only degrees @≤ maxDeg@
+-- are produced.  Since both input lists are sorted by ascending degree,
+-- 'takeWhile' provides early termination on the inner loop.
+kunneth :: Int -> GradedGroup -> GradedGroup -> GradedGroup
+kunneth maxDeg (GradedGroup m1) (GradedGroup m2) =
   let entries1 = IM.toAscList m1
       entries2 = IM.toAscList m2
   in mconcat
        [ singletonGG (i + j) (tensorG g1 g2)
-         <> singletonGG (i + j + 1) (torG g1 g2)
+         <> if i + j < maxDeg
+            then singletonGG (i + j + 1) (torG g1 g2)
+            else mempty
        | (i, g1) <- entries1
-       , (j, g2) <- entries2
+       , i <= maxDeg
+       , (j, g2) <- takeWhile (\(j', _) -> i + j' <= maxDeg) entries2
        ]
 
 -- | Universal Coefficients Theorem for integral cohomology.
