@@ -1,0 +1,6 @@
+name = "GEMM"
+uuid = "a1c2d3e4-5678-9abc-def0-123456789abc"
+version = "1.0.0"
+
+[deps]
+JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"

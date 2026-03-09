@@ -1,0 +1,9 @@
+[package]
+name = "gemm"
+version = "1.0.0"
+edition = "2021"
+description = "Safe Rust bindings to the GEMM Haskell library"
+
+[dependencies]
+gemm-sys = { path = "../gemm-sys" }
+serde_json = "1"
