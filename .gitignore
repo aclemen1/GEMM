@@ -11,23 +11,6 @@ dist-newstyle/
 cabal.project.local
 cabal.project.local~
 
-# Legacy C++
-*.slo
-*.lo
-*.obj
-*.gch
-*.pch
-*.so
-*.dylib
-*.dll
-*.lai
-*.la
-*.a
-*.lib
-*.exe
-*.out
-*.app
-
 # OS
 .DS_Store
 
