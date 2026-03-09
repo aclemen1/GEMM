@@ -38,5 +38,5 @@ texput.log
 # Local files
 local/
 
-# Large PDFs (reference only)
-Tischler.pdf
+# Claude Code
+CLAUDE.md
