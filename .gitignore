@@ -27,5 +27,8 @@ ffi/python/gemm/__pycache__/
 ffi/julia/GEMM/Manifest.toml
 ffi/lib/
 
+# Benchmark output
+bench/benchmark_results.csv
+
 # Claude Code
 CLAUDE.local.md
