@@ -53,16 +53,47 @@ cabal run gemm -- --cert --name myDef p f n range
 
 Parameters: `p` = prime, `f` = log-order of cyclic group Z/p^f, `n` = connectivity+1, `range` = upper bound for computation.
 
-### Schema introspection (AI agent discovery)
+## AI agent integration
+
+The GEMM CLI is designed to be auto-discoverable by AI agents. All output is structured JSON (with `--json`), human messages go to stderr, and the built-in `schema` command lets agents introspect capabilities at runtime — no documentation pre-loading required.
+
+### Schema introspection
 
 ```
-cabal run gemm -- schema                # list all commands (JSON)
-cabal run gemm -- schema homology-p     # describe K(Z/p^f, n) command
-cabal run gemm -- schema homology-z     # describe K(Z, n) command
-cabal run gemm -- schema certificate    # describe certificate command
+gemm schema                # tool overview: commands, flags, output formats
+gemm schema homology-p     # K(Z/p^f, n): parameters, constraints, response JSON Schema
+gemm schema homology-z     # K(Z, n): parameters, constraints, response JSON Schema
+gemm schema certificate    # Lean 4 certificate: parameters, constraints
 ```
 
-AI agents can query `gemm schema` at runtime to discover available commands, parameter types and constraints, output formats, and examples — no documentation pre-loading required.
+An agent workflow typically looks like:
+
+1. **Discover** — call `gemm schema` to list available commands
+2. **Introspect** — call `gemm schema homology-p` to get parameter types, constraints, and the response JSON Schema
+3. **Execute** — call `gemm --json 3 1 4 20` and parse the structured output
+4. **Handle errors** — errors are returned as JSON to stderr with `code`, `message`, and `reason` fields
+
+### Structured output
+
+Every computation mode supports `--json` for machine-readable output. Response schemas are documented via `gemm schema <command>` and follow JSON Schema conventions (`type`, `properties`, `items`, `required`, `additionalProperties`).
+
+### Agent skill example
+
+```markdown
+# GEMM — Compute homology of Eilenberg-MacLane spaces
+
+## When to use
+When the user asks about integral (co)homology groups of K(G, n) spaces,
+homology exponents, or needs Lean 4 proof certificates.
+
+## Discovery
+Run `gemm schema` to list commands. Run `gemm schema <command>` for details.
+
+## Quick reference
+- `gemm --json p f n range` — H_*(K(Z/p^f, n); Z) as JSON
+- `gemm --json Z n range`   — H_*(K(Z, n); Z) as JSON
+- `gemm --cert p f n range` — Lean 4 proof certificate
+```
 
 ### Web interface
 

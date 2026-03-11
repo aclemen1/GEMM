@@ -42,11 +42,12 @@ parseOpts = go defaultOpts
     go opts ("--name":n:xs)  = go (opts { optName = Just n }) xs
     go opts xs               = (opts, xs)
 
--- | Run the CLI with the given arguments.
-runCLI :: [String] -> IO ()
-runCLI args = do
+-- | Run the CLI with the given arguments.  The version string is
+--   provided by the caller (from Paths_gemm).
+runCLI :: String -> [String] -> IO ()
+runCLI ver args = do
   case args of
-    ("schema":rest) -> runSchema rest
+    ("schema":rest) -> runSchema ver rest
     _ -> runCLI' args
 
 -- | Run the CLI after schema dispatch.

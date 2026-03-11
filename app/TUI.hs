@@ -78,6 +78,7 @@ data AppState' = AS
   , _asEditingPath   :: Bool          -- ^ Whether the path is being edited
   , _asPreviewIsLazy :: Bool          -- ^ True if _asPreviewRaw is LaTeX (lazy Text)
   , _asPreviewLazy   :: TL.Text       -- ^ Lazy text for LaTeX export
+  , _asVersion       :: String        -- ^ Version string from gemm.cabal
   }
 
 makeLenses ''AppState'
@@ -90,8 +91,8 @@ data AppEvent
 -- Initial state
 -- ============================================================
 
-initialState :: AppState'
-initialState = AS
+initialState :: String -> AppState'
+initialState ver = AS
   { _asScreen       = MenuScreen
   , _asSpaceType    = SpacePF
   , _asMenuItem     = 0
@@ -116,6 +117,7 @@ initialState = AS
   , _asEditingPath  = False
   , _asPreviewIsLazy = False
   , _asPreviewLazy  = TL.empty
+  , _asVersion      = ver
   }
 
 -- ============================================================
@@ -167,7 +169,7 @@ drawMenu :: AppState' -> Widget Name
 drawMenu s = vBox
   [ str ""
   , hCenter $ str "The Generalized Eilenberg-MacLane Machine"
-  , hCenter $ str "Version 4.1"
+  , hCenter $ str ("Version " ++ _asVersion s)
   , str ""
   , hCenter $ str "Computes the integral homology and cohomology"
   , hCenter $ str "of Eilenberg-MacLane spaces K(G, n)."
@@ -631,12 +633,13 @@ app = App
   , appAttrMap      = const theMap
   }
 
--- | Launch the TUI.
-runTUI :: IO ()
-runTUI = do
+-- | Launch the TUI.  The version string is provided by the caller
+--   (from Paths_gemm) to keep gemm.cabal as the single source of truth.
+runTUI :: String -> IO ()
+runTUI ver = do
   chan <- newBChan 10
   -- defaultConfig does not enable mouse mode, so terminal-native
   -- text selection and copy-paste works out of the box.
   let buildVty = VCP.mkVty V.defaultConfig
   initialVty <- buildVty
-  void $ customMain initialVty buildVty (Just chan) app initialState
+  void $ customMain initialVty buildVty (Just chan) app (initialState ver)

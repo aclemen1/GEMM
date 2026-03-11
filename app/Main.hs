@@ -8,12 +8,18 @@
 module Main where
 
 import System.Environment (getArgs)
+import Data.Version (showVersion)
+import Paths_gemm (version)
 import GEMM.CLI (runCLI)
 import TUI (runTUI)
+
+-- | Version string derived from gemm.cabal (single source of truth).
+versionStr :: String
+versionStr = showVersion version
 
 main :: IO ()
 main = do
   args <- getArgs
   case args of
-    [] -> runTUI
-    _  -> runCLI args
+    [] -> runTUI versionStr
+    _  -> runCLI versionStr args

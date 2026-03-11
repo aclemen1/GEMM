@@ -11,29 +11,29 @@ module GEMM.Schema
 
 import Data.List (intercalate)
 
--- | Version matching gemm.cabal.
-version :: String
-version = "1.0.0"
-
--- | Dispatch the schema subcommand.
-runSchema :: [String] -> IO ()
-runSchema []               = putStrLn toolSchema
-runSchema ["homology-p"]   = putStrLn homologyPSchema
-runSchema ["homology-z"]   = putStrLn homologyZSchema
-runSchema ["certificate"]  = putStrLn certificateSchema
-runSchema [unknown]        = do
-  putStrLn $ "{ \"error\": \"Unknown command: " ++ jsonEsc unknown ++ "\" }"
-runSchema _                = do
-  putStrLn "{ \"error\": \"Usage: gemm schema [command]\" }"
+-- | Dispatch the schema subcommand.  The version string is passed in
+--   from the caller (via Paths_gemm) to keep gemm.cabal as the single
+--   source of truth.
+runSchema :: String -> [String] -> IO ()
+runSchema ver []               = putStrLn (toolSchema ver)
+runSchema _   ["homology-p"]   = putStrLn homologyPSchema
+runSchema _   ["homology-z"]   = putStrLn homologyZSchema
+runSchema _   ["certificate"]  = putStrLn certificateSchema
+runSchema _   [unknown]        = do
+  putStrLn $ schemaError 400 ("Unknown command: " ++ unknown)
+    "validationError"
+runSchema _   _                = do
+  putStrLn $ schemaError 400
+    "Usage: gemm schema [command]" "validationError"
 
 -- ---------------------------------------------------------------------------
 -- Tool-level schema (gemm schema)
 -- ---------------------------------------------------------------------------
 
-toolSchema :: String
-toolSchema = obj
+toolSchema :: String -> String
+toolSchema ver = obj
   [ "name"        .= str "gemm"
-  , "version"     .= str version
+  , "version"     .= str ver
   , "description" .= str "The Generalized Eilenberg-MacLane Machine. Computes integral homology and cohomology groups of Eilenberg-MacLane spaces K(Z/p^f, n) for any prime p, and K(Z, n)."
   , "commands"    .= arr
       [ obj
@@ -88,13 +88,7 @@ homologyPSchema = obj
       ]
   , "output" .= obj
       [ "default_format" .= str "latex"
-      , "json_schema" .= obj
-          [ "space"      .= str "string — LaTeX name of the space, e.g. K(\\\\Z/3,4)"
-          , "parameters" .= str "object — { p: int, f: int, n: int, range: int }"
-          , "homology"   .= str "object — degree (string) -> group (LaTeX string), e.g. { \"0\": \"\\\\Z\", \"4\": \"\\\\Z/3\" }"
-          , "cohomology" .= str "object — same structure as homology"
-          , "generators" .= str "array — [{ degree: int, genus: int, type: string, sequence: int[], pair: [string, string] }]"
-          ]
+      , "json_schema" .= responseSchemaP
       ]
   , "examples" .= arr
       [ obj [ "description" .= str "H_*(K(Z/2, 2); Z) up to degree 10, JSON"
@@ -124,13 +118,7 @@ homologyZSchema = obj
       ]
   , "output" .= obj
       [ "default_format" .= str "latex"
-      , "json_schema" .= obj
-          [ "space"      .= str "string — e.g. K(\\\\Z,4)"
-          , "parameters" .= str "object — { n: int, range: int }"
-          , "homology"   .= str "object — degree (string) -> group (LaTeX string)"
-          , "cohomology" .= str "object — same structure as homology"
-          , "generators" .= str "array — [{ prime: int|null, degree: int, genus: int, type: string, sequence?: int[], pair?: [string, string], generator?: string }]"
-          ]
+      , "json_schema" .= responseSchemaZ
       ]
   , "examples" .= arr
       [ obj [ "description" .= str "H_*(K(Z, 2); Z) up to degree 10, JSON"
@@ -169,6 +157,113 @@ certificateSchema = obj
       , obj [ "description" .= str "Certificate with custom name"
             , "command"     .= str "gemm --cert --name myProof 3 1 4 20"
             ]
+      ]
+  ]
+
+-- ---------------------------------------------------------------------------
+-- Response JSON Schemas
+-- ---------------------------------------------------------------------------
+
+-- | Graded group schema: { "0": "\\Z", "2": "\\Z/3", ... }
+gradedGroupSchema :: String -> String
+gradedGroupSchema desc = obj
+  [ "type"                 .= str "object"
+  , "description"          .= str desc
+  , "additionalProperties" .= obj
+      [ "type"        .= str "string"
+      , "description" .= str "Abelian group in LaTeX notation"
+      ]
+  ]
+
+-- | Generator schema for K(Z/p^f, n).
+generatorSchemaP :: String
+generatorSchemaP = obj
+  [ "type"  .= str "array"
+  , "items" .= obj
+      [ "type"       .= str "object"
+      , "properties" .= obj
+          [ "degree"   .= obj [ "type" .= str "integer", "description" .= str "Degree of the generator" ]
+          , "genus"    .= obj [ "type" .= str "integer", "description" .= str "Genus (1, 2, or 3)" ]
+          , "type"     .= obj [ "type" .= str "string",  "description" .= str "Elementary complex type: P (polynomial) or E (exterior)", "enum" .= arr [str "P", str "E"] ]
+          , "sequence" .= obj [ "type" .= str "array",   "items" .= obj ["type" .= str "integer"], "description" .= str "Admissible sequence" ]
+          , "pair"     .= obj [ "type" .= str "array",   "items" .= obj ["type" .= str "string"], "description" .= str "Pair of Steenrod operation words" ]
+          ]
+      , "required" .= arr (map str ["degree", "genus", "type", "sequence", "pair"])
+      ]
+  ]
+
+-- | Generator schema for K(Z, n).
+generatorSchemaZ :: String
+generatorSchemaZ = obj
+  [ "type"  .= str "array"
+  , "items" .= obj
+      [ "type"       .= str "object"
+      , "properties" .= obj
+          [ "prime"     .= obj [ "type" .= arr [str "integer", str "null"], "description" .= str "Prime p (null for the fundamental class)" ]
+          , "degree"    .= obj [ "type" .= str "integer", "description" .= str "Degree of the generator" ]
+          , "genus"     .= obj [ "type" .= str "integer", "description" .= str "Genus (1, 2, or 3)" ]
+          , "type"      .= obj [ "type" .= str "string",  "description" .= str "Elementary complex type: P or E", "enum" .= arr [str "P", str "E"] ]
+          , "sequence"  .= obj [ "type" .= str "array",   "items" .= obj ["type" .= str "integer"], "description" .= str "Admissible sequence" ]
+          , "pair"      .= obj [ "type" .= str "array",   "items" .= obj ["type" .= str "string"], "description" .= str "Pair of Steenrod operation words" ]
+          , "generator" .= obj [ "type" .= str "string",  "description" .= str "Generator name (fundamental class only)" ]
+          ]
+      , "required" .= arr (map str ["degree", "genus", "type"])
+      ]
+  ]
+
+-- | Full response schema for K(Z/p^f, n) with --json.
+responseSchemaP :: String
+responseSchemaP = obj
+  [ "type"       .= str "object"
+  , "properties" .= obj
+      [ "space"      .= obj [ "type" .= str "string",  "description" .= str "LaTeX name of the space, e.g. K(\\\\Z/3,4)" ]
+      , "parameters" .= obj
+          [ "type"       .= str "object"
+          , "properties" .= obj
+              [ "p"     .= obj [ "type" .= str "integer" ]
+              , "f"     .= obj [ "type" .= str "integer" ]
+              , "n"     .= obj [ "type" .= str "integer" ]
+              , "range" .= obj [ "type" .= str "integer" ]
+              ]
+          ]
+      , "homology"   .= gradedGroupSchema "Integral homology groups by degree"
+      , "cohomology" .= gradedGroupSchema "Integral cohomology groups by degree"
+      , "generators" .= generatorSchemaP
+      ]
+  , "required" .= arr (map str ["space", "parameters", "homology", "cohomology", "generators"])
+  ]
+
+-- | Full response schema for K(Z, n) with --json.
+responseSchemaZ :: String
+responseSchemaZ = obj
+  [ "type"       .= str "object"
+  , "properties" .= obj
+      [ "space"      .= obj [ "type" .= str "string",  "description" .= str "LaTeX name of the space, e.g. K(\\\\Z,4)" ]
+      , "parameters" .= obj
+          [ "type"       .= str "object"
+          , "properties" .= obj
+              [ "n"     .= obj [ "type" .= str "integer" ]
+              , "range" .= obj [ "type" .= str "integer" ]
+              ]
+          ]
+      , "homology"   .= gradedGroupSchema "Integral homology groups by degree"
+      , "cohomology" .= gradedGroupSchema "Integral cohomology groups by degree"
+      , "generators" .= generatorSchemaZ
+      ]
+  , "required" .= arr (map str ["space", "parameters", "homology", "cohomology", "generators"])
+  ]
+
+-- ---------------------------------------------------------------------------
+-- Structured errors (GWS-style)
+-- ---------------------------------------------------------------------------
+
+-- | Structured error response.
+schemaError :: Int -> String -> String -> String
+schemaError code msg reason = obj
+  [ "error" .= obj
+      [ "code"    .= bare (show code)
+      , "message" .= str msg
+      , "reason"  .= str reason
       ]
   ]
 
