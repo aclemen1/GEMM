@@ -53,6 +53,17 @@ cabal run gemm -- --cert --name myDef p f n range
 
 Parameters: `p` = prime, `f` = log-order of cyclic group Z/p^f, `n` = connectivity+1, `range` = upper bound for computation.
 
+### Schema introspection (AI agent discovery)
+
+```
+cabal run gemm -- schema                # list all commands (JSON)
+cabal run gemm -- schema homology-p     # describe K(Z/p^f, n) command
+cabal run gemm -- schema homology-z     # describe K(Z, n) command
+cabal run gemm -- schema certificate    # describe certificate command
+```
+
+AI agents can query `gemm schema` at runtime to discover available commands, parameter types and constraints, output formats, and examples — no documentation pre-loading required.
+
 ### Web interface
 
 ```

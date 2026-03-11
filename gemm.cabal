@@ -24,6 +24,7 @@ library
     GEMM.JSON
     GEMM.Certificate
     GEMM.CLI
+    GEMM.Schema
   hs-source-dirs:  src
   build-depends:
     base        >= 4.17 && < 5,

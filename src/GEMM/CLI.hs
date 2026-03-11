@@ -21,6 +21,7 @@ import GEMM.EilenbergMacLane
 import GEMM.LaTeX (renderDocumentP, renderDocumentZ)
 import GEMM.JSON (renderJsonP, renderJsonZ)
 import GEMM.Certificate (computeCertificateP, certificateToLean)
+import GEMM.Schema (runSchema)
 
 data Opts = Opts
   { optJson :: Bool
@@ -44,6 +45,13 @@ parseOpts = go defaultOpts
 -- | Run the CLI with the given arguments.
 runCLI :: [String] -> IO ()
 runCLI args = do
+  case args of
+    ("schema":rest) -> runSchema rest
+    _ -> runCLI' args
+
+-- | Run the CLI after schema dispatch.
+runCLI' :: [String] -> IO ()
+runCLI' args = do
   let (opts, rest) = parseOpts args
   case rest of
     -- K(Z, n): gemm [flags] Z n range
@@ -69,6 +77,7 @@ usage = do
   putStrLn "  gemm [flags] s n range                  — K(Z/2^s, n)"
   putStrLn "  gemm [flags] p f n range                — K(Z/p^f, n)"
   putStrLn "  gemm [flags] Z n range                  — K(Z, n)"
+  putStrLn "  gemm schema [command]                   — introspect commands (JSON)"
   putStrLn ""
   putStrLn "Flags:"
   putStrLn "  --json           Output JSON instead of LaTeX"
